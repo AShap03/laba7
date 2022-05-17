@@ -2,6 +2,8 @@ package laba7;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -25,6 +27,10 @@ public class Main extends JFrame {
 
     private static final int FROM_FIELD_DEFAULT_COLUMNS = 10;
     private static final int TO_FIELD_DEFAULT_COLUMNS = 20;
+
+    private static final int SMALL_GAP = 5;
+    private static final int MEDIUM_GAP = 10;
+    private static final int LARGE_GAP = 15;
 
     public Main() {
         super(FRAME_TITLE);
@@ -54,6 +60,45 @@ public class Main extends JFrame {
         final JPanel messagePanel = new JPanel();
         messagePanel.setBorder(BorderFactory.createTitledBorder("Сообщение"));
 
+        // Кнопка отправки сообщения
+        final JButton sendButton = new JButton("Отправить");
+        sendButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sendMessage();
+            }
+        });
+        // Компоновка элементов панели "Сообщение"
+        final GroupLayout layout2 = new GroupLayout(messagePanel);
+        messagePanel.setLayout(layout2);
+        layout2.setHorizontalGroup(layout2.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout2.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                        .addGroup(layout2.createSequentialGroup()
+                                .addComponent(labelFrom)
+                                .addGap(SMALL_GAP)
+                                .addComponent(textFieldFrom)
+                                .addGap(LARGE_GAP)
+                                .addComponent(labelTo)
+                                .addGap(SMALL_GAP)
+                                .addComponent(textFieldTo))
+                        .addComponent(scrollPaneOutgoing)
+                        .addComponent(sendButton))
+                .addContainerGap());
+
+        layout2.setVerticalGroup(layout2.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout2.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addComponent(labelFrom)
+                        .addComponent(textFieldFrom)
+                        .addComponent(labelTo)
+                        .addComponent(textFieldTo))
+                .addGap(MEDIUM_GAP)
+                .addComponent(scrollPaneOutgoing)
+                .addGap(MEDIUM_GAP)
+                .addComponent(sendButton)
+                .addContainerGap());
+
         // Компоновка элементов фрейма
         final GroupLayout layout1 = new GroupLayout(getContentPane());
         setLayout(layout1);
@@ -71,6 +116,11 @@ public class Main extends JFrame {
                 .addComponent(messagePanel)
                 .addContainerGap());
     }
+
+    private void sendMessage() {
+
+    }
+
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
