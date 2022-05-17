@@ -17,7 +17,14 @@ public class Main extends JFrame {
     private final JTextArea textAreaIncoming;
     private static final int INCOMING_AREA_DEFAULT_ROWS = 10;
 
+    private final JTextField textFieldFrom;
+    private final JTextField textFieldTo;
 
+    private final JTextArea textAreaOutgoing;
+    private static final int OUTGOING_AREA_DEFAULT_ROWS = 5;
+
+    private static final int FROM_FIELD_DEFAULT_COLUMNS = 10;
+    private static final int TO_FIELD_DEFAULT_COLUMNS = 20;
 
     public Main() {
         super(FRAME_TITLE);
@@ -33,9 +40,19 @@ public class Main extends JFrame {
 
         // Контейнер, обеспечивающий прокрутку текстовой области
         final JScrollPane scrollPaneIncoming = new JScrollPane(textAreaIncoming);
-// Подписи полей
+        // Подписи полей
         final JLabel labelFrom = new JLabel("Подпись");
         final JLabel labelTo = new JLabel("Получатель");
+        // Поля ввода имени пользователя и адреса получателя
+        textFieldFrom = new JTextField(FROM_FIELD_DEFAULT_COLUMNS);
+        textFieldTo = new JTextField(TO_FIELD_DEFAULT_COLUMNS);
+        // Текстовая область для ввода сообщения
+        textAreaOutgoing = new JTextArea(OUTGOING_AREA_DEFAULT_ROWS, 0);
+        // Контейнер, обеспечивающий прокрутку текстовой области
+        final JScrollPane scrollPaneOutgoing = new JScrollPane(textAreaOutgoing);
+        // Панель ввода сообщения
+        final JPanel messagePanel = new JPanel();
+        messagePanel.setBorder(BorderFactory.createTitledBorder("Сообщение"));
 
         // Компоновка элементов фрейма
         final GroupLayout layout1 = new GroupLayout(getContentPane());
@@ -43,14 +60,15 @@ public class Main extends JFrame {
         layout1.setHorizontalGroup(layout1.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout1.createParallelGroup()
-                        .addComponent(scrollPaneIncoming)));
-
-
+                        .addComponent(scrollPaneIncoming)
+                        .addComponent(messagePanel))
+                .addContainerGap());
 
         layout1.setVerticalGroup(layout1.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(scrollPaneIncoming)
 
+                .addComponent(messagePanel)
                 .addContainerGap());
     }
 
