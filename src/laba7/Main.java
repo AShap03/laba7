@@ -32,6 +32,8 @@ public class Main extends JFrame {
     private static final int MEDIUM_GAP = 10;
     private static final int LARGE_GAP = 15;
 
+    private static final int SERVER_PORT = 4567;
+
     public Main() {
         super(FRAME_TITLE);
         setMinimumSize(new Dimension(FRAME_MINIMUM_WIDTH, FRAME_MINIMUM_HEIGHT));
@@ -115,8 +117,44 @@ public class Main extends JFrame {
 
                 .addComponent(messagePanel)
                 .addContainerGap());
-    }
 
+        // Создание и запуск потока-обработчика запросов
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    final ServerSocket serverSocket =
+                            new ServerSocket(SERVER_PORT);
+
+                    while (!Thread.interrupted()) {
+                        final Socket socket = serverSocket.accept();
+                        final DataInputStream in = new DataInputStream(socket.getInputStream());
+// Читаем имя отправителя
+                        final String senderName = in.readUTF();
+// Читаем сообщение
+                        final String message = in.readUTF();
+// Закрываем соединение
+                        socket.close();
+// Выделяем IP-адрес
+                        final String address =
+                                ((InetSocketAddress) socket
+                                        .getRemoteSocketAddress())
+                                        .getAddress()
+                                        .getHostAddress();
+// Выводим сообщение в текстовую область
+                        textAreaIncoming.append(senderName +
+                                " (" + address + "): " +
+                                message + "\n");
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    JOptionPane.showMessageDialog(Main.this,
+                            "Ошибка в работе сервера", "Ошибка",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }).start();
+    }
     private void sendMessage() {
 
     }
@@ -132,4 +170,4 @@ public class Main extends JFrame {
             }
         });
     }
-}
+    }
