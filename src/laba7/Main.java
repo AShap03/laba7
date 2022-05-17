@@ -5,10 +5,12 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
 public class Main extends JFrame {
     private static final String FRAME_TITLE = "Клиент мгновенных сообщений";
@@ -156,7 +158,72 @@ public class Main extends JFrame {
         }).start();
     }
     private void sendMessage() {
-
+        try {
+            // Получаем необходимые параметры
+            final String senderName = textFieldFrom.getText();
+            final String destinationAddress = textFieldTo.getText();
+            final String message = textAreaOutgoing.getText();
+            //Проверка корректности IP-адреса
+            String[] ipArr = destinationAddress.split("\\.");
+            if(ipArr.length != 4) {
+                JOptionPane.showMessageDialog(this, "IP-адрес введен неверно!" ,
+                        "Ошибка", JOptionPane.ERROR_MESSAGE);
+                textFieldTo.requestFocusInWindow();
+                return;
+            }
+            for(String ipValue : ipArr){
+                int i = Integer.parseInt(ipValue);
+                if(( i < 0 ) || ( i > 255 )) {
+                    JOptionPane.showMessageDialog(this, "IP-адрес введен неверно!" ,
+                            "Ошибка", JOptionPane.ERROR_MESSAGE);
+                    textFieldTo.requestFocusInWindow();
+                    return;
+                }
+            }
+            // Убеждаемся, что поля не пустые
+            if (senderName.isEmpty()) {
+                JOptionPane.showMessageDialog(this,
+                        "Введите имя отправителя", "Ошибка",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (destinationAddress.isEmpty()) {
+                JOptionPane.showMessageDialog(this,
+                        "Введите адрес узла-получателя", "Ошибка",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (message.isEmpty()) {
+                JOptionPane.showMessageDialog(this,
+                        "Введите текст сообщения", "Ошибка",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            // Создаем сокет для соединения
+            final Socket socket = new Socket(destinationAddress, SERVER_PORT);
+            // Открываем поток вывода данных
+            final DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+            // Записываем в поток имя
+            out.writeUTF(senderName);
+            // Записываем в поток сообщение
+            out.writeUTF(message);
+            // Закрываем сокет
+            socket.close();
+            // Помещаем сообщения в текстовую область вывода
+            textAreaIncoming.append("Я -> " + destinationAddress + ": " + message + "\n");
+            // Очищаем текстовую область ввода сообщения
+            textAreaOutgoing.setText("");
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(Main.this,
+                    "Не удалось отправить сообщение: узел-адресат не найден", "Ошибка",
+                    JOptionPane.ERROR_MESSAGE);
+        } catch (IOException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(Main.this,
+                    "Не удалось отправить сообщение", "Ошибка",
+                    JOptionPane.ERROR_MESSAGE);
+        }
     }
 
 
